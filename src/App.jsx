@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Events from './pages/Events'
 import EventDetails from './pages/EventDetails'
+import Contact from './pages/Contact'
 import './App.css'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/events" element={<Events />} />
           <Route path="/event/:id" element={<EventDetails />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>
       <Footer />
