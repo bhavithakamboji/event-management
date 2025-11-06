@@ -1,11 +1,16 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
+  const navigate = useNavigate()
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e) => {
     setFormData({
@@ -14,10 +19,18 @@ export default function Login() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Add your login logic here
-    console.log('Login submitted:', formData)
+    setError('')
+    try {
+      setSubmitting(true)
+      await Promise.resolve(login({ email: formData.email, password: formData.password }))
+      navigate('/')
+    } catch (err) {
+      setError(err?.message || 'Login failed')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -28,6 +41,7 @@ export default function Login() {
             <h2>Welcome Back</h2>
             <p>Login to your account</p>
           </div>
+          {error && (<p style={{ color: 'red', marginTop: '8px' }}>{error}</p>)}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Email</label>
@@ -60,12 +74,11 @@ export default function Login() {
                 Forgot password?
               </Link>
             </div>
-            <button type="submit" className="auth-button">Login</button>
+            <button type="submit" className="auth-button" disabled={submitting}>{submitting ? 'Logging in...' : 'Login'}</button>
           </form>
           <div className="auth-footer">
             <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
             <div className="social-login">
-              <p>Or login with</p>
               <div className="social-icons">
                 <button className="social-icon google">
                   <i className="fab fa-google"></i>
