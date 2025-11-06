@@ -1,86 +1,79 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Booking.css";
 
 export default function Booking() {
-  const [form, setForm] = useState({
-    eventType: "",
-    guests: "",
-    date: "",
-    location: "",
-    services: [],
-  });
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleServiceSelect = (service) => {
-    const selected = form.services.includes(service)
-      ? form.services.filter((s) => s !== service)
-      : [...form.services, service];
-    setForm({ ...form, services: selected });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:8080/api/bookings", form);
-      alert("Booking Successful!");
-    } catch (err) {
-      console.error(err);
-      alert("Booking Failed!");
+  const eventTypes = [
+    {
+      id: "wedding",
+      title: "Wedding",
+      icon: "💍",
+      description: "Plan your dream wedding celebration",
+      image: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      id: "birthday",
+      title: "Birthday",
+      icon: "🎂",
+      description: "Celebrate special moments with style",
+      image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      id: "festivals",
+      title: "Festivals",
+      icon: "🎉",
+      description: "Vibrant festivals and cultural events",
+      image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      id: "corporate",
+      title: "Corporate",
+      icon: "💼",
+      description: "Professional corporate events and meetings",
+      image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
     }
+  ];
+
+  const handleEventSelect = (eventType) => {
+    navigate(`/booking/${eventType}`);
   };
 
   return (
-    <div className="booking-form">
-      <h2>Book Your Event</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Event Type:</label>
-        <select name="eventType" onChange={handleChange}>
-          <option value="">Select</option>
-          <option value="Birthday">Birthday</option>
-          <option value="Wedding">Wedding</option>
-          <option value="Corporate">Corporate</option>
-        </select>
-
-        <label>Number of Guests:</label>
-        <input
-          type="number"
-          name="guests"
-          placeholder="e.g. 50"
-          onChange={handleChange}
-        />
-
-        <label>Date:</label>
-        <input type="date" name="date" onChange={handleChange} />
-
-        <label>Location:</label>
-        <input
-          type="text"
-          name="location"
-          placeholder="Enter event location"
-          onChange={handleChange}
-        />
-
-        <label>Select Services:</label>
-        <div className="service-options">
-          {["Catering", "Decoration", "Photography", "Music"].map((service) => (
-            <div key={service}>
-              <input
-                type="checkbox"
-                id={service}
-                onChange={() => handleServiceSelect(service)}
-              />
-              <label htmlFor={service}>{service}</label>
+    <div className="booking-selection-page">
+      <div className="booking-selection-container">
+        <h1 className="booking-main-title">Plan Your Event</h1>
+        <p className="booking-subtitle">Select the type of event you'd like to plan</p>
+        <div className="event-types-grid">
+          {eventTypes.map((event) => (
+            <div
+              key={event.id}
+              className="event-type-card"
+              onClick={() => handleEventSelect(event.id)}
+            >
+              <div className="event-type-image-wrapper">
+                <img
+                  src={event.image}
+                  alt={event.title}
+                  className="event-type-image"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/400x300?text=Event+Image';
+                  }}
+                />
+                <div className="event-type-overlay"></div>
+              </div>
+              <div className="event-type-content">
+                <div className="event-icon">{event.icon}</div>
+                <h3>{event.title}</h3>
+                <p>{event.description}</p>
+                <button className="select-event-btn">Select Event</button>
+              </div>
             </div>
           ))}
         </div>
-
-        <button type="submit">Submit Booking</button>
-      </form>
+      </div>
     </div>
   );
 }

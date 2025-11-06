@@ -31,6 +31,25 @@ export default function Navbar() {
     }
   };
 
+  const handleAboutUsClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/");
+      // Wait for navigation to complete, then scroll
+      setTimeout(() => {
+        const whyChooseUsSection = document.getElementById("why-choose-us");
+        if (whyChooseUsSection) {
+          whyChooseUsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    } else {
+      // Already on home page, just scroll
+      const whyChooseUsSection = document.getElementById("why-choose-us");
+      if (whyChooseUsSection) {
+        whyChooseUsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
   const handleContactClick = () => {
     navigate("/contact");
   };
@@ -53,8 +72,7 @@ export default function Navbar() {
       <h1 className="logo" onClick={handleHomeClick}>EventEase</h1>
       <ul className="nav-links">
         <li onClick={handleHomeClick}>Home</li>
-        <li onClick={handleServicesClick}>About Us</li>
-        <li>Bookings</li>
+        <li onClick={handleAboutUsClick}>About Us</li>
         <li onClick={handleContactClick}>Contact</li>
         {currentUser ? (
           <>

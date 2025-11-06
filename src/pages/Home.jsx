@@ -40,14 +40,14 @@ export default function Home() {
         <div className="hero-content">
           <h1 className="hero-title">Plan Your Perfect Event</h1>
           <p className="hero-subtitle">From birthdays to weddings — we've got you covered!</p>
-          <button className="hero-button" onClick={() => navigate("/events")}>
+          <button className="hero-button" onClick={() => navigate("/booking")}>
             Start Booking
           </button>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="features-section">
+      <section id="why-choose-us" className="features-section">
         <div className="features-container">
           <h2 className="section-title">Why Choose Us?</h2>
           <div className="features-grid">
@@ -71,31 +71,46 @@ export default function Home() {
       </section>
 
       {/* Event Types Section */}
-      <section className="event-types-section">
+      <section id="event-types" className="event-types-section">
         <div className="event-types-container">
           <h2 className="section-title">Event Types</h2>
           <p className="section-subtitle">We specialize in creating unforgettable experiences</p>
           <div className="event-types-grid">
-            {eventTypes.map((event) => (
-              <div key={event.id} className="event-type-card">
-                <div className="event-type-image-container">
-                  <img 
-                    src={event.image} 
-                    alt={event.title}
-                    className="event-type-image"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/400x300?text=Event+Image';
-                    }}
-                  />
-                  <div className="event-type-overlay"></div>
+            {eventTypes.map((event) => {
+              const eventTypeMap = {
+                "Weddings": "wedding",
+                "Birthdays": "birthday",
+                "Corporate": "corporate",
+                "Festivals": "festivals"
+              };
+              const eventTypeId = eventTypeMap[event.title] || event.title.toLowerCase();
+              
+              return (
+                <div 
+                  key={event.id} 
+                  className="event-type-card"
+                  onClick={() => navigate(`/booking/${eventTypeId}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="event-type-image-container">
+                    <img 
+                      src={event.image} 
+                      alt={event.title}
+                      className="event-type-image"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/400x300?text=Event+Image';
+                      }}
+                    />
+                    <div className="event-type-overlay"></div>
+                  </div>
+                  <div className="event-type-content">
+                    <h3>{event.title}</h3>
+                    <p>{event.description}</p>
+                  </div>
                 </div>
-                <div className="event-type-content">
-                  <h3>{event.title}</h3>
-                  <p>{event.description}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
