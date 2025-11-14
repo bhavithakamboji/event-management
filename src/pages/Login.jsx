@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import api from '../api/config'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { setCurrentUser } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -17,17 +18,41 @@ export default function Login() {
       ...formData,
       [e.target.name]: e.target.value
     })
+    setError('') // Clear error when user types
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSubmitting(true)
+    
     try {
-      setSubmitting(true)
-      await Promise.resolve(login({ email: formData.email, password: formData.password }))
+      const response = await api.post('/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      })
+      
+      console.log('Login successful:', response.data)
+      
+      // Store the token and user info
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token)
+        if (response.data.user) {
+          const user = response.data.user
+          localStorage.setItem('user', JSON.stringify(user))
+          // Update AuthContext
+          setCurrentUser({ id: user.id, name: user.name, email: user.email })
+        }
+      }
+      
+      // Redirect to home page
       navigate('/')
     } catch (err) {
-      setError(err?.message || 'Login failed')
+      console.error('Login failed:', err.response?.data || err.message)
+      const errorMessage = err?.response?.data?.message || 
+                          err?.message || 
+                          'Invalid email or password'
+      setError(errorMessage)
     } finally {
       setSubmitting(false)
     }

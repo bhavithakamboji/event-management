@@ -1,0 +1,60 @@
+package com.example.backend.controller;
+
+import com.example.backend.model.User;
+import com.example.backend.repository.UserRepository;
+import com.example.backend.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody Map<String,String> body){
+        String name = body.get("name");
+        String email = body.get("email");
+        String password = body.get("password");
+
+        if(userRepository.findByEmail(email).isPresent()){
+            return ResponseEntity.badRequest().body(Map.of("message","Email already registered"));
+        }
+
+        User u = new User();
+        u.setName(name);
+        u.setEmail(email);
+        u.setPassword(passwordEncoder.encode(password));
+        userRepository.save(u);
+
+        String token = jwtUtil.generateToken(u.getEmail());
+        return ResponseEntity.ok(Map.of("token", token, "user", Map.of("id", u.getId(), "name", u.getName(), "email", u.getEmail())));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String,String> body){
+        String email = body.get("email");
+        String password = body.get("password");
+        Optional<User> opt = userRepository.findByEmail(email);
+        if(opt.isEmpty()) return ResponseEntity.status(401).body(Map.of("message","Invalid credentials"));
+        User u = opt.get();
+        if(!passwordEncoder.matches(password, u.getPassword())){
+            return ResponseEntity.status(401).body(Map.of("message","Invalid credentials"));
+        }
+        String token = jwtUtil.generateToken(u.getEmail());
+        return ResponseEntity.ok(Map.of("token", token, "user", Map.of("id", u.getId(), "name", u.getName(), "email", u.getEmail())));
+    }
+}

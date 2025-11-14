@@ -9,28 +9,28 @@ export default function Booking() {
     {
       id: "wedding",
       title: "Wedding",
-      icon: "💍",
+      icon: "",
       description: "Plan your dream wedding celebration",
       image: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
     },
     {
       id: "birthday",
       title: "Birthday",
-      icon: "🎂",
+      icon: "",
       description: "Celebrate special moments with style",
       image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
     },
     {
       id: "festivals",
       title: "Festivals",
-      icon: "🎉",
-      description: "Vibrant festivals and cultural events",
+      icon: "",
+      description: "Vibrant festivals and cultural celebrations",
       image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
     },
     {
       id: "corporate",
       title: "Corporate",
-      icon: "💼",
+      icon: "",
       description: "Professional corporate events and meetings",
       image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
     }
@@ -65,7 +65,7 @@ export default function Booking() {
                 <div className="event-type-overlay"></div>
               </div>
               <div className="event-type-content">
-                <div className="event-icon">{event.icon}</div>
+                {event.icon && <div className="event-icon">{event.icon}</div>}
                 <h3>{event.title}</h3>
                 <p>{event.description}</p>
                 <button className="select-event-btn">Select Event</button>
