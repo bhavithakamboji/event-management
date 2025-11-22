@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import api from '../api/config'
 
 export default function Signup() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,10 +19,21 @@ export default function Signup() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Add your signup logic here
-    console.log('Signup submitted:', formData)
+    try {
+      const response = await api.post('/api/auth/signup', formData)
+      console.log('Signup successful:', response.data)
+      // Store the token
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token)
+      }
+      // Redirect to login page
+      navigate('/login')
+    } catch (error) {
+      console.error('Signup failed:', error.response?.data || error.message)
+      // Here you should add proper error handling, e.g., showing an error message to the user
+    }
   }
 
   return (

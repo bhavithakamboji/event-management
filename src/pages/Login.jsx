@@ -24,10 +24,11 @@ export default function Login() {
     setError('')
     try {
       setSubmitting(true)
-      await Promise.resolve(login({ email: formData.email, password: formData.password }))
+      await login({ email: formData.email, password: formData.password })
       navigate('/')
     } catch (err) {
-      setError(err?.message || 'Login failed')
+      // 👇 ensure we show backend message or fallback
+      setError(err?.message || 'Invalid email or password')
     } finally {
       setSubmitting(false)
     }
@@ -74,7 +75,13 @@ export default function Login() {
                 Forgot password?
               </Link>
             </div>
-            <button type="submit" className="auth-button" disabled={submitting}>{submitting ? 'Logging in...' : 'Login'}</button>
+            <button
+              type="submit"
+              className="auth-button"
+              disabled={submitting}
+            >
+              {submitting ? 'Logging in...' : 'Login'}
+            </button>
           </form>
           <div className="auth-footer">
             <p>Don't have an account? <Link to="/signup">Sign up</Link></p>

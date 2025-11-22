@@ -1,78 +1,82 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import api from '../api/config'
 
-const USERS_KEY = 'em_users'
-const CURRENT_USER_KEY = 'em_current_user'
-
+// create context
 const AuthContext = createContext(null)
 
-function readUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
-}
+export const AuthProvider = ({ children }) => {
+  // keep user in state + localStorage
+  const [currentUser, setCurrentUser] = useState(() => {
+    const stored = localStorage.getItem('user')
+    return stored ? JSON.parse(stored) : null
+  })
 
-function writeUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users))
-}
+  // 🔹 LOGIN – calls backend /api/auth/login
+  const login = async ({ email, password }) => {
+    try {
+      const res = await api.post('/api/auth/login', { email, password })
 
-function readCurrentUser() {
-  try {
-    const raw = localStorage.getItem(CURRENT_USER_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
+      const { token, user } = res.data || {}
 
-function writeCurrentUser(user) {
-  if (user) localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user))
-  else localStorage.removeItem(CURRENT_USER_KEY)
-}
+      if (token) {
+        localStorage.setItem('token', token)
+      }
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user))
+        setCurrentUser(user)
+      }
 
-export function AuthProvider({ children }) {
-  const [users, setUsers] = useState(() => readUsers())
-  const [currentUser, setCurrentUser] = useState(() => readCurrentUser())
+      return user
+    } catch (error) {
+      console.error('Login error:', error)
 
-  useEffect(() => {
-    writeUsers(users)
-  }, [users])
+      const msg =
+        error.response?.data?.message ||
+        (error.response?.status === 401
+          ? 'Invalid email or password'
+          : 'Login failed')
 
-  useEffect(() => {
-    writeCurrentUser(currentUser)
-  }, [currentUser])
-
-  const signup = (payload) => {
-    const { name, email, password } = payload
-    const normalizedEmail = String(email).trim().toLowerCase()
-    const existing = users.find(u => u.email === normalizedEmail)
-    if (existing) {
-      throw new Error('An account with this email already exists')
+      // so Login.jsx can catch(err) and show err.message
+      throw new Error(msg)
     }
-    const newUser = { id: crypto.randomUUID(), name: String(name).trim(), email: normalizedEmail, password }
-    const nextUsers = [...users, newUser]
-    setUsers(nextUsers)
-    setCurrentUser({ id: newUser.id, name: newUser.name, email: newUser.email })
-    return { id: newUser.id, name: newUser.name, email: newUser.email }
   }
 
-  const login = ({ email, password }) => {
-    const normalizedEmail = String(email).trim().toLowerCase()
-    const user = users.find(u => u.email === normalizedEmail && u.password === password)
-    if (!user) {
-      throw new Error('Invalid email or password')
+  // 🔹 SIGNUP – you can also use context for signup if needed
+  const signup = async ({ name, email, password }) => {
+    try {
+      const res = await api.post('/api/auth/signup', { name, email, password })
+      const { token, user } = res.data || {}
+
+      if (token) {
+        localStorage.setItem('token', token)
+      }
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user))
+        setCurrentUser(user)
+      }
+
+      return user
+    } catch (error) {
+      console.error('Signup error:', error)
+      const msg =
+        error.response?.data?.message || 'Signup failed'
+      throw new Error(msg)
     }
-    setCurrentUser({ id: user.id, name: user.name, email: user.email })
-    return { id: user.id, name: user.name, email: user.email }
   }
 
+  // 🔹 LOGOUT
   const logout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setCurrentUser(null)
   }
 
-  const value = useMemo(() => ({ users, currentUser, signup, login, logout }), [users, currentUser])
+  const value = {
+    currentUser,
+    login,
+    signup,
+    logout,
+  }
 
   return (
     <AuthContext.Provider value={value}>
@@ -81,11 +85,5 @@ export function AuthProvider({ children }) {
   )
 }
 
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider')
-  return ctx
-}
-
-
-
+// hook to use in components
+export const useAuth = () => useContext(AuthContext)
