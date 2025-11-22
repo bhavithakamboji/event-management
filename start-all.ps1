@@ -19,3 +19,7 @@ Write-Host "Frontend will be available at: http://localhost:5173" -ForegroundCol
 Write-Host "`nPress any key to exit this window (services will continue running)..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44

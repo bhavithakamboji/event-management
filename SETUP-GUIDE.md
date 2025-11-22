@@ -104,3 +104,7 @@ Once the backend is rebuilt, you can use the startup scripts:
 - Stop any existing Java/Node processes
 - Or change ports in configuration files
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44

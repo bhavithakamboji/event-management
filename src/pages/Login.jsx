@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import api from '../api/config'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { setCurrentUser } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -17,18 +18,50 @@ export default function Login() {
       ...formData,
       [e.target.name]: e.target.value
     })
+    setError('') // Clear error when user types
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSubmitting(true)
+    
     try {
+<<<<<<< HEAD
       setSubmitting(true)
       await login({ email: formData.email, password: formData.password })
       navigate('/')
     } catch (err) {
       // 👇 ensure we show backend message or fallback
       setError(err?.message || 'Invalid email or password')
+=======
+      const response = await api.post('/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      })
+      
+      console.log('Login successful:', response.data)
+      
+      // Store the token and user info
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token)
+        if (response.data.user) {
+          const user = response.data.user
+          localStorage.setItem('user', JSON.stringify(user))
+          // Update AuthContext
+          setCurrentUser({ id: user.id, name: user.name, email: user.email })
+        }
+      }
+      
+      // Redirect to home page
+      navigate('/')
+    } catch (err) {
+      console.error('Login failed:', err.response?.data || err.message)
+      const errorMessage = err?.response?.data?.message || 
+                          err?.message || 
+                          'Invalid email or password'
+      setError(errorMessage)
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44
     } finally {
       setSubmitting(false)
     }

@@ -13,3 +13,7 @@ if (-not (Test-Path "node_modules")) {
 Write-Host "Starting development server..." -ForegroundColor Yellow
 npm run dev
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44

@@ -536,6 +536,38 @@
   border-bottom: none;
 }
 
+<<<<<<< HEAD
+=======
+.pricing-section-header {
+  padding: 15px 0 10px;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.pricing-section-header .pricing-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.pricing-row.pricing-service-item {
+  padding: 10px 0;
+}
+
+.pricing-row.pricing-service-item .pricing-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.pricing-note {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 400;
+}
+
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44
 .pricing-row.pricing-info {
   font-size: 0.9rem;
   color: #666;

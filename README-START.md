@@ -60,3 +60,7 @@ Make sure MySQL is running before starting the backend.
 
 To change database settings, edit: `backend/src/main/resources/application.properties`
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44

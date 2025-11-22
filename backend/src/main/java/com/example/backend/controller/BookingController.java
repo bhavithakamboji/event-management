@@ -145,3 +145,7 @@ public class BookingController {
     }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44
