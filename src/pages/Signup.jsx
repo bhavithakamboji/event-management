@@ -24,22 +24,8 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-<<<<<<< HEAD
-    try {
-      const response = await api.post('/api/auth/signup', formData)
-      console.log('Signup successful:', response.data)
-      // Store the token
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token)
-      }
-      // Redirect to login page
-      navigate('/login')
-    } catch (error) {
-      console.error('Signup failed:', error.response?.data || error.message)
-      // Here you should add proper error handling, e.g., showing an error message to the user
-=======
     setError('')
-    
+
     // Validate password confirmation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
@@ -60,21 +46,24 @@ export default function Signup() {
         email: formData.email,
         password: formData.password
       }
-      
+
       console.log('Submitting signup to:', 'http://localhost:8080/api/auth/signup')
       console.log('Signup data:', signupData)
-      
+
+      // 🔹 Make sure no old/invalid token is sent in Authorization header
+      localStorage.removeItem('token')
+
       const response = await api.post('/api/auth/signup', signupData)
       console.log('Signup successful:', response.data)
-      
-      // Store the token and user info
+
+      // Store the token and user info (optional – you can also just redirect to login)
       if (response.data.token) {
         localStorage.setItem('token', response.data.token)
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user))
         }
       }
-      
+
       // Show success message and redirect
       alert('Account created successfully! Please login with your credentials.')
       navigate('/login')
@@ -87,11 +76,15 @@ export default function Signup() {
         statusText: error?.response?.statusText,
         code: error?.code
       })
-      
+
       let errorMessage = ''
-      
+
       // Check for network errors
-      if (error?.code === 'ERR_NETWORK' || error?.message?.includes('Network Error') || error?.message?.includes('Failed to fetch')) {
+      if (
+        error?.code === 'ERR_NETWORK' ||
+        error?.message?.includes('Network Error') ||
+        error?.message?.includes('Failed to fetch')
+      ) {
         errorMessage = 'Network Error: Cannot connect to the server.\n\n'
         errorMessage += 'Please ensure:\n'
         errorMessage += '1. Backend server is running on http://localhost:8080\n'
@@ -99,17 +92,17 @@ export default function Signup() {
         errorMessage += '3. Check browser console (F12) for more details'
       } else if (error?.response) {
         // Server responded with error
-        errorMessage = error?.response?.data?.message || 
-                      error?.response?.data?.error ||
-                      `Server error (${error?.response?.status}): ${error?.response?.statusText}`
+        errorMessage =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          `Server error (${error?.response?.status}): ${error?.response?.statusText}`
       } else {
         errorMessage = error?.message || 'Signup failed. Please try again.'
       }
-      
+
       setError(errorMessage)
     } finally {
       setSubmitting(false)
->>>>>>> 80f9e57715b420c978ff74e0bae77a9dcd115c44
     }
   }
 
@@ -122,16 +115,18 @@ export default function Signup() {
             <p>Sign up to get started</p>
           </div>
           {error && (
-            <div style={{ 
-              color: 'red', 
-              marginTop: '8px', 
-              marginBottom: '8px',
-              padding: '10px',
-              backgroundColor: '#ffe6e6',
-              border: '1px solid #ff9999',
-              borderRadius: '5px',
-              whiteSpace: 'pre-line'
-            }}>
+            <div
+              style={{
+                color: 'red',
+                marginTop: '8px',
+                marginBottom: '8px',
+                padding: '10px',
+                backgroundColor: '#ffe6e6',
+                border: '1px solid #ff9999',
+                borderRadius: '5px',
+                whiteSpace: 'pre-line'
+              }}
+            >
               {error}
             </div>
           )}
@@ -191,7 +186,9 @@ export default function Signup() {
             </button>
           </form>
           <div className="auth-footer">
-            <p>Already have an account? <Link to="/login">Login</Link></p>
+            <p>
+              Already have an account? <Link to="/login">Login</Link>
+            </p>
           </div>
         </div>
       </div>

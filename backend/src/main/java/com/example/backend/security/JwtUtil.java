@@ -16,10 +16,15 @@ public class JwtUtil {
     @Value("${app.jwtSecret}")
     private String jwtSecret;
 
-    private final long expirationMs = 1000 * 60 * 60 * 24; // 24h
+    private final long expirationMs = 1000L * 60 * 60 * 24; // 24h
+
+    private Key getSigningKey() {
+        // Make sure key is strong enough
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
 
     public String generateToken(String subject){
-        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        Key key = getSigningKey();
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date())
@@ -29,17 +34,21 @@ public class JwtUtil {
     }
 
     public String getUsernameFromToken(String token){
-        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        Key key = getSigningKey();
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
         return claims.getSubject();
     }
 
     public boolean validateToken(String token){
         try{
-            Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            Key key = getSigningKey();
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        }catch(Exception ex){
+        } catch(Exception ex){
             return false;
         }
     }
